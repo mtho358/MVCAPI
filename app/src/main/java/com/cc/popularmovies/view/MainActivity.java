@@ -31,18 +31,29 @@ public class MainActivity extends AppCompatActivity {
 
         binding.movieRecyclerview.setAdapter(adapter);
 
-        movieRetrofit.getAllUpcomingMovies()
-                .enqueue(new Callback<MovieResponse>() {
-                    @Override
-                    public void onResponse(Call<MovieResponse> call, Response<MovieResponse> response) {
-                        assert response.body() != null;
-                        adapter.setResults(response.body().getMoviesUpcoming());
-                    }
+        new Thread() {
 
-                    @Override
-                    public void onFailure(Call<MovieResponse> call, Throwable t) {
-                        Log.d("TAG_M", "OOPS..." + call.request().url());
-                    }
-                });
+            @Override
+            public void run() {
+                super.run();
+                try{
+                    movieRetrofit.getAllUpcomingMovies().enqueue(new Callback<MovieResponse>() {
+                            @Override
+                            public void onResponse
+                                    (Call<MovieResponse> call, Response<MovieResponse> response) {
+                                assert response.body() != null;
+                                adapter.setResults(response.body().getMoviesUpcoming());
+                            }
+
+                            @Override
+                            public void onFailure(Call<MovieResponse> call, Throwable t) {
+                                Log.d("TAG_M", "OOPS..." + call.request().url());
+                            }
+                        });
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
+            }
+        }.start();
     }
 }
